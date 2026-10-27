@@ -1,0 +1,20 @@
+menu "Slipway link test"
+
+    choice LINKTEST_POWER
+        prompt "Where the USB-A host socket gets its 5V"
+        default LINKTEST_POWER_USB_DEV
+        help
+            The board's host socket can be powered from the male USB-A plug (when it is plugged into a charger
+            or power bank) or from a LiPo battery through the board's boost converter (slide switch on).
+
+        config LINKTEST_POWER_USB_DEV
+            bool "From the male USB-A plug (charger / power bank)"
+        config LINKTEST_POWER_BATTERY
+            bool "From the battery (boost converter)"
+    endchoice
+
+    config LINKTEST_LIMIT_500MA
+        bool "Limit the host socket to 500 mA"
+        default y
+
+endmenu
