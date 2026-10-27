@@ -1,0 +1,27 @@
+name: Build link test
+on:
+  workflow_dispatch:
+  push:
+    paths: ["linktest/**", "components/**", ".github/workflows/**"]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test the protocol library against Felucca's Python installer
+        run: |
+          git clone --depth 1 https://github.com/hugelton/Felucca /tmp/felucca
+          python3 host_tests/run_tests.py /tmp/felucca/tools/fm1_install.py
+      - name: Build for ESP32-S3
+        uses: espressif/esp-idf-ci-action@v1
+        with:
+          esp_idf_version: v5.4
+          target: esp32s3
+          path: linktest
+          command: "idf.py build && cd build && esptool.py --chip esp32s3 merge_bin -o ../linktest-merged.bin @flash_args"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: slipway-linktest
+          path: |
+            linktest/linktest-merged.bin
+            linktest/build/*.bin
