@@ -1,8 +1,8 @@
-name: Build link test
+name: Build link test and SD browser
 on:
   workflow_dispatch:
   push:
-    paths: ["linktest/**", "components/**", ".github/workflows/**"]
+    paths: ["linktest/**", "browser/**", "components/**", "host_tests/**", ".github/workflows/**"]
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -12,16 +12,27 @@ jobs:
         run: |
           git clone --depth 1 https://github.com/hugelton/Felucca /tmp/felucca
           python3 host_tests/run_tests.py /tmp/felucca/tools/fm1_install.py
-      - name: Build for ESP32-S3
+      - name: Test the firmware file checker (same rules as Slipway)
+        run: python3 host_tests/run_fw_tests.py
+      - name: Build the link test for ESP32-S3
         uses: espressif/esp-idf-ci-action@v1
         with:
           esp_idf_version: v5.4
           target: esp32s3
           path: linktest
           command: "idf.py build && cd build && esptool.py --chip esp32s3 merge_bin -o ../linktest-merged.bin @flash_args"
+      - name: Build the SD card browser for ESP32-S3
+        uses: espressif/esp-idf-ci-action@v1
+        with:
+          esp_idf_version: v5.4
+          target: esp32s3
+          path: browser
+          command: "idf.py build && cd build && esptool.py --chip esp32s3 merge_bin -o ../browser-merged.bin @flash_args"
       - uses: actions/upload-artifact@v4
         with:
           name: slipway-linktest
-          path: |
-            linktest/linktest-merged.bin
-            linktest/build/*.bin
+          path: linktest/linktest-merged.bin
+      - uses: actions/upload-artifact@v4
+        with:
+          name: slipway-browser
+          path: browser/browser-merged.bin
