@@ -49,7 +49,7 @@ static void screen_start(void)
     lv_obj_set_style_text_color(s_title, lv_color_hex(0xd9b36c), 0);
     lv_obj_align(s_title, LV_ALIGN_TOP_LEFT, 4, 2);
     s_body = lv_label_create(scr);
-    lv_label_set_long_mode(s_body, LV_LABEL_LONG_CLIP);
+    lv_label_set_long_mode(s_body, LV_LABEL_LONG_WRAP);
     lv_obj_set_width(s_body, BSP_LCD_H_RES - 8);
     lv_obj_set_style_text_color(s_body, lv_color_hex(0xf2f2f2), 0);
     lv_obj_align(s_body, LV_ALIGN_TOP_LEFT, 4, 42);
