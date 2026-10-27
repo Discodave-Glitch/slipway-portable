@@ -10,6 +10,11 @@ const uint8_t FW_STOCK_SHA256[32] = {
     0xbb, 0x28, 0x60, 0x16, 0x78, 0xd3, 0x64, 0x40, 0x49, 0xf9, 0x9d, 0xc4, 0x0e, 0x7e, 0xdb, 0x8a,
 };
 
+const uint8_t FW_STOCK_V16_SHA256[32] = {
+    0xd0, 0x17, 0xfb, 0x65, 0xe7, 0x0a, 0xca, 0x97, 0xee, 0x29, 0xd9, 0x44, 0x47, 0x0c, 0x35, 0x15,
+    0xa7, 0x45, 0x81, 0xdf, 0x5c, 0x05, 0x76, 0xbf, 0x70, 0xde, 0x91, 0x7c, 0x7b, 0x2b, 0x61, 0xd5,
+};
+
 /* ------------------------------------------------------------------------------------ SHA-256 --- */
 static const uint32_t K[64] = {
     0x428a2f98,0x71374491,0xb5c0fbcf,0xe9b5dba5,0x3956c25b,0x59f111f1,0x923f82a4,0xab1c5ed5,
@@ -167,8 +172,10 @@ void fwscan_finish(fwscan_t *s, fwcheck_result_t *r)
         refuse(r, "Product name in the header is unreadable");
         return;
     }
-    r->official = (s->total == FW_STOCK_SIZE) && memcmp(r->sha256, FW_STOCK_SHA256, 32) == 0 &&
-                  strcmp(r->product, FW_STOCK_PRODUCT) == 0;
+    r->official = ((s->total == FW_STOCK_SIZE) && memcmp(r->sha256, FW_STOCK_SHA256, 32) == 0 &&
+                   strcmp(r->product, FW_STOCK_PRODUCT) == 0) ||
+                  ((s->total == FW_STOCK_V16_SIZE) && memcmp(r->sha256, FW_STOCK_V16_SHA256, 32) == 0 &&
+                   strcmp(r->product, FW_STOCK_V16_PRODUCT) == 0);
     if (!r->has_loader && !r->official) { refuse(r, "No Felucca loader marker: the installer refuses it"); return; }
     r->ok = true;
 }

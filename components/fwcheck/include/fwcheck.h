@@ -5,7 +5,7 @@
  *   - the chip marker "AC791N" within the first 4096 bytes
  *   - a product name in the header (e.g. FM-1_015) shaped like  name_number
  *   - the Felucca loader marker "FELUCCA-LOADER-1" somewhere in the file, unless it is exactly the official V15
- *   - "official V15" means: 699,956 bytes, SHA-256 db1642b2...edb8a, product FM-1_015
+ *   - "official stock" means V15 (699,956 bytes, SHA-256 db1642b2...edb8a, product FM-1_015) or V16 (718,196 bytes, SHA-256 d017fb65...61d5, product FM-1_016)
  * Feed the file in pieces (any size) with fwscan_feed, then call fwscan_finish. Nothing here writes anything. */
 #ifndef FWCHECK_H
 #define FWCHECK_H
@@ -25,6 +25,9 @@ extern "C" {
 #define FW_STOCK_SIZE  699956u
 #define FW_STOCK_PRODUCT "FM-1_015"
 extern const uint8_t FW_STOCK_SHA256[32];
+#define FW_STOCK_V16_SIZE 718196u          /* M-VAVE's current download, FM-1_016 */
+#define FW_STOCK_V16_PRODUCT "FM-1_016"
+extern const uint8_t FW_STOCK_V16_SHA256[32];
 
 /* SHA-256, streaming */
 typedef struct { uint32_t h[8]; uint8_t buf[64]; size_t blen; uint64_t total; } fw_sha256_t;

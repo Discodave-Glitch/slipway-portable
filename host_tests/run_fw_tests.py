@@ -7,6 +7,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 slip = sys.argv[1] if len(sys.argv) > 1 else None
 stock_file = sys.argv[2] if len(sys.argv) > 2 else None
+stock16_file = sys.argv[3] if len(sys.argv) > 3 else None
 tmp = tempfile.mkdtemp()
 exe = os.path.join(tmp, "fwcheck_cli")
 subprocess.check_call(["gcc", "-std=c11", "-O1", "-g", "-fsanitize=address,undefined", "-Wall", "-Wextra", "-Werror",
@@ -116,6 +117,17 @@ if stock_file and os.path.exists(stock_file):
     if ref: check("real official V15 file: Slipway agrees it can be flashed as stock", ref[1].can_flash(p, is_stock=True) is None)
 else:
     print("skip (no real stock file given)")
+
+if stock16_file and os.path.exists(stock16_file):
+    raw16 = open(stock16_file, "rb").read()
+    d, _ = run(raw16, 4096, "FM-1.fwsc")
+    check("real official V16 file: official, ok, product FM-1_016",
+          d["official"] == "1" and d["ok"] == "1" and d["product"] == "FM-1_016" and d["size"] == "718196")
+    alt = bytearray(raw16); alt[300000] ^= 1
+    d, _ = run(bytes(alt), 4096, "FM-1.fwsc")
+    check("V16 with one changed byte is not official (and is refused: no loader)", d["official"] == "0" and d["ok"] == "0")
+else:
+    print("skip (no real V16 file given)")
 
 print("\n%d FAILED" % fails if fails else "\nall passed")
 sys.exit(1 if fails else 0)

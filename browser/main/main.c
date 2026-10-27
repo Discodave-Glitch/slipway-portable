@@ -3,7 +3,7 @@
  *
  * READ-ONLY. Lists the .fwsc files on the SD card (in the card's top folder and in a folder called "firmware"),
  * and on OK checks the highlighted one with the same rules as Slipway (size, chip marker, product name, Felucca
- * loader marker, official V15 fingerprint). It never uses USB, never talks to an FM-1 and never writes to the card.
+ * loader marker, official V15/V16 fingerprint). It never uses USB, never talks to an FM-1 and never writes to the card.
  *
  * Buttons: UP / DW move, OK checks the file, MENU looks at the card again.
  * Board: Espressif ESP32-S3-USB-OTG (or a compatible copy), via Espressif's board support package.
@@ -195,7 +195,9 @@ static void show_result(const entry_t *f, const fwcheck_result_t *r)
     if (r->product[0]) { snprintf(line, sizeof(line), "Product: %s\n", r->product); strcat(body, line); }
     fw_hex(r->sha256, 6, hex);
     snprintf(line, sizeof(line), "Fingerprint: %s...\n\n", hex); strcat(body, line);
-    if (r->official)      strcat(body, "OFFICIAL V15 (stock). This is\nthe way back: keep it safe.\n");
+    if (r->official)      strcat(body, strcmp(r->product, "FM-1_016") == 0 ?
+                                       "OFFICIAL V16 (stock). Put-back\nis untested: keep your V15 too.\n" :
+                                       "OFFICIAL V15 (stock). This is\nthe way back: keep it safe.\n");
     else if (r->ok)       strcat(body, "OK: custom firmware with the\nFelucca loader marker. Not\nchecked for what its keys do.\n");
     else                  { snprintf(line, sizeof(line), "REFUSED:\n%s\n", r->reason); strcat(body, line); }
     strcat(body, "\nany button: back to the list");
