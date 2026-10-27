@@ -3,15 +3,15 @@
 A pocket FM-1 firmware installer on an **ESP32-S3-USB-OTG** board (USB-A host socket, small screen, buttons, SD slot).
 The companion to [Slipway](https://github.com/Discodave-Glitch/slipway) for Windows and Mac.
 
-**Status: stage 0, a read-only link test. Nothing here can install or change anything on an FM-1.**
-Nothing has been run on real hardware yet. The protocol library is tested against Felucca's own Python installer;
+**Status: stages 0 and 1 (both read-only). Nothing here can install or change anything on an FM-1.**
+Stage 0 has run on a real board (screen, USB host and 5 V verified with a USB stick; not yet with an FM-1). The protocol library is tested against Felucca's own Python installer;
 the board code has not been compiled by its author (see "What is and isn't tested").
 
 ## Stages
 | Stage | What | State |
 |---|---|---|
-| 0 | **Link test**: plug the FM-1 into the board, the screen shows what the FM-1 says it is (e.g. `FM-1_015`). Read-only. | written, untested on hardware |
-| 1 | Read `.fwsc` files from the SD card, check them (size, chip marker, identity, stock V15 hash), show them in a list | not started |
+| 0 | **Link test**: plug the FM-1 into the board, the screen shows what the FM-1 says it is (e.g. `FM-1_015`). Read-only. | runs on the board; USB stick detected; FM-1 not yet tried |
+| 1 | **SD browser**: list the `.fwsc` files on the SD card and check each one (size, chip marker, product name, Felucca loader marker, official V15 fingerprint) with the same rules as Slipway. Read-only, no FM-1 needed. | written; rules tested on a PC against Slipway's own code, screen/buttons/SD not yet run on the board |
 | 2 | Stock-first rules (same as Slipway), saved on the SD card | not started |
 | 3 | Install, with the same safety checks as Felucca's installer. Only after stage 0 and 1 work on a real board. | not started |
 | 4 | WiFi: download from the Slipway catalogue / GitHub | not started |
@@ -47,3 +47,12 @@ GPL-3.0-only (see `LICENSE`), because the protocol code is a port of Felucca's i
 * Board: Espressif ESP32-S3-USB-OTG (the Amazon version is a generic copy).
 
 At your own risk. This is hobby software for a hobby device.
+
+## Try the SD browser (stage 1)
+1. Run **Actions -> Build link test and SD browser**. Download the **slipway-browser** artifact: `browser-merged.bin`.
+2. Flash it the same way as the link test (address `0x0`).
+3. Put `.fwsc` files on a **FAT32** micro SD card (top folder, or a folder called `firmware`) and put the card in the slot on the back of the board.
+4. Power the board. **UP / DW** move, **OK** checks the highlighted file, **MENU** looks at the card again.
+5. You should see `OFFICIAL V15 (stock)` for the M-VAVE file, `OK: custom firmware ...` for a custom firmware, and `REFUSED: ...` with a reason otherwise.
+This program never uses USB and never touches an FM-1. The checking rules are in `components/fwcheck` and are tested on a PC
+(`python3 host_tests/run_fw_tests.py [path-to-Slipway] [official-FM-1.fwsc]`) against Python's hashlib and Slipway's own rules.
