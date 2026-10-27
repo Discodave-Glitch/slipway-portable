@@ -1,8 +1,8 @@
-name: Build link test and SD browser
+name: Build link test, SD browser and installer
 on:
   workflow_dispatch:
   push:
-    paths: ["linktest/**", "browser/**", "components/**", "host_tests/**", ".github/workflows/**"]
+    paths: ["linktest/**", "browser/**", "installer/**", "components/**", "host_tests/**", ".github/workflows/**"]
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -14,6 +14,8 @@ jobs:
           python3 host_tests/run_tests.py /tmp/felucca/tools/fm1_install.py
       - name: Test the firmware file checker (same rules as Slipway)
         run: python3 host_tests/run_fw_tests.py
+      - name: Test the install sequence (simulated FM-1), the stock record and the SD update logic
+        run: python3 host_tests/run_install_tests.py
       - name: Build the link test for ESP32-S3
         uses: espressif/esp-idf-ci-action@v1
         with:
@@ -36,3 +38,18 @@ jobs:
         with:
           name: slipway-browser
           path: browser/browser-merged.bin
+      - name: Build the installer for ESP32-S3
+        uses: espressif/esp-idf-ci-action@v1
+        with:
+          esp_idf_version: v5.4
+          target: esp32s3
+          path: installer
+          command: "idf.py build && cd build && esptool.py --chip esp32s3 merge_bin -o ../installer-merged.bin @flash_args"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: slipway-installer
+          path: installer/installer-merged.bin
+      - uses: actions/upload-artifact@v4
+        with:
+          name: slipway-installer-update
+          path: installer/build/slipway_installer.bin
