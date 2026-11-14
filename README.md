@@ -62,3 +62,5 @@ GPL-3.0-only (see `LICENSE`), because the protocol code is a port of Felucca's i
 * Board: Espressif ESP32-S3-USB-OTG (the Amazon version is a generic copy).
 
 At your own risk. This is hobby software for a hobby device.
+
+You can also try Slipway Portable in the browser, no flashing needed, in the free community [FM-1 Emulator](https://fm1-emulator.atst.tools/).
